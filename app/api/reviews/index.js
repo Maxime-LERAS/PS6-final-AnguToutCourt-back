@@ -1,25 +1,28 @@
-const { Router } = require('express');
+const {Router} = require('express');
+const { Review} = require('../../models');
 
 const router = new Router();
 
 
-// router.get('/', (req, res) => {
-//   try {
-//     if (req.query.q) {
-//       res.status(200).json(Review.search(req.query.q).map(review => attach(review)));
-//     } else {
-//       res.status(200).json(Review.get()
-//         .map(review => attach(review)));
-//     }
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
+router.get('/', (req, res) => {
+
+  try {
+    if (req.query.major) {
+      res.status(200).json(Review.get().filter(review => review.major === req.query.major && review.verified.toString() === "false"));
+    } else {
+      res.status(200).json(Review.get().filter(review => review.verified.toString() === "false"));
+    }
+
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 
 router.get('/:id', (req, res) => {
   try {
     const reviewToSend = Review.getById(req.params.id);
-    res.status(200).json(attach(reviewToSend));
+    res.status(200).json(reviewToSend);
   } catch (err) {
     if (err.name === 'NotFoundError') {
       res.status(404).end();
@@ -58,7 +61,7 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   try {
-    Profile.delete(req.params.id);
+    Review.delete(req.params.id);
     res.status(204).end();
   } catch (err) {
     if (err.name === 'NotFoundError') {
