@@ -8,11 +8,18 @@ router.get('/', (req, res) => {
 
   try {
     if (req.query.major) {
-      res.status(200).json(Review.get().filter(review => review.major === req.query.major && review.verified.toString() === "false"));
+      if(req.query.verified){
+        res.status(200).json(Review.get().filter(review => review.major === req.query.major && review.verified.toString() === req.query.verified));
+      } else {
+        res.status(200).json(Review.get().filter(review => review.major === req.query.major));
+      }
     } else {
-      res.status(200).json(Review.get().filter(review => review.verified.toString() === "false"));
+      if(req.query.verified){
+        res.status(200).json(Review.get().filter(review.verified.toString() === req.query.verified));
+      } else {
+        res.status(200).json(Review.get());
+      }
     }
-
   } catch (err) {
     res.status(500).json(err);
   }
@@ -47,6 +54,7 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
   try {
+    console.log(req.body);
     res.status(200).json(Review.update(req.params.id, req.body));
   } catch (err) {
     if (err.name === 'NotFoundError') {
